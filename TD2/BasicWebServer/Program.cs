@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Web;
 
@@ -18,8 +19,8 @@ namespace BasicServerHTTPlistener
                 Console.WriteLine("A more recent Windows version is required to use the HttpListener class.");
                 return;
             }
- 
- 
+
+
             // Create a listener.
             HttpListener listener = new HttpListener();
 
@@ -49,7 +50,8 @@ namespace BasicServerHTTPlistener
             }
 
             // Trap Ctrl-C on console to exit 
-            Console.CancelKeyPress += delegate {
+            Console.CancelKeyPress += delegate
+            {
                 // call methods to close socket and exit
                 listener.Stop();
                 listener.Close();
@@ -71,7 +73,7 @@ namespace BasicServerHTTPlistener
                         documentContents = readStream.ReadToEnd();
                     }
                 }
-                
+
                 // get url 
                 Console.WriteLine($"Received request for {request.Url}");
 
@@ -102,24 +104,135 @@ namespace BasicServerHTTPlistener
                 Console.WriteLine("param3 = " + HttpUtility.ParseQueryString(request.Url.Query).Get("param3"));
                 Console.WriteLine("param4 = " + HttpUtility.ParseQueryString(request.Url.Query).Get("param4"));
 
+                string[] p =
+                {
+                    HttpUtility.ParseQueryString(request.Url.Query).Get("param1"),
+                    HttpUtility.ParseQueryString(request.Url.Query).Get("param2"),
+                    HttpUtility.ParseQueryString(request.Url.Query).Get("param3"),
+                    HttpUtility.ParseQueryString(request.Url.Query).Get("param4")
+                };
+
                 //
                 Console.WriteLine(documentContents);
 
                 // Obtain a response object.
                 HttpListenerResponse response = context.Response;
+                string htmlResponse = "";
 
-                // Construct a response.
-                string responseString = "<HTML><BODY> Hello world!</BODY></HTML>";
+                if (request.Url.Segments.Length > 1)
+                {
+                    switch (request.Url.Segments[1])
+                    {
+                        case "exercice1/":
+                            if (request.Url.Segments.Length > 2)
+                            {
+                                if (p[2] == "UwU" || p[3] == "UwU")
+                                {
+                                    htmlResponse = "You found the easter egg ! UwU";
+                                }
+                                else
+                                {
+                                    Type methodsType = typeof(MyMethods);
+                                    MethodInfo method = methodsType.GetMethod(request.Url.Segments[2]);
+
+                                    if (method == null)
+                                    {
+                                        htmlResponse = "Bad method !";
+                                    }
+                                    else
+                                    {
+                                        try
+                                        {
+                                            string result = (string)methodsType.GetMethod(request.Url.Segments[2]).Invoke(null, new object[] { p[0], p[1] });
+                                            htmlResponse = $"The result is {result}";
+                                        }
+                                        catch (TargetInvocationException)
+                                        {
+                                            htmlResponse = "Error: at least one of the two given arguments is not a number !";
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                htmlResponse = "No method ! Try with add, multiply or substract.";
+                            }
+                            break;
+
+                        case "exercice2/":
+                            htmlResponse = "Coming soon !";
+                            break;
+
+                        case "exercice3/":
+                            htmlResponse = "Coming soon !";
+                            break;
+
+                        default:
+                            htmlResponse = "Invalid path !";
+                            break;
+                    }
+                }
+                else
+                {
+                    htmlResponse = "Bad path !";
+                }
+
+                string responseString = $"<!DOCTYPE html><html><body>{htmlResponse}</body></html>";
                 byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseString);
-                // Get a response stream and write the response to it.
                 response.ContentLength64 = buffer.Length;
                 System.IO.Stream output = response.OutputStream;
                 output.Write(buffer, 0, buffer.Length);
-                // You must close the output stream.
                 output.Close();
+
+
             }
             // Httplistener neither stop ... But Ctrl-C do that ...
             // listener.Stop();
+        }
+    }
+
+    internal class MyMethods
+    {
+        public static string add(string p1, string p2)
+        {
+            try
+            {
+                int n1 = Int32.Parse(p1);
+                int n2 = Int32.Parse(p2);
+                return (n1 + n2).ToString();
+            }
+            catch (FormatException)
+            {
+                throw new FormatException();
+            }
+        }
+
+        public static string substract(string p1, string p2)
+        {
+            try
+            {
+                int n1 = Int32.Parse(p1);
+                int n2 = Int32.Parse(p2);
+                return (n1 - n2).ToString();
+            }
+            catch (FormatException)
+            {
+                throw new FormatException();
+            }
+        }
+
+        public static string multiply(string p1, string p2)
+        {
+            try
+            {
+                int n1 = Int32.Parse(p1);
+                int n2 = Int32.Parse(p2);
+                return (n1 * n2).ToString();
+            }
+            catch (FormatException)
+            {
+                throw new FormatException();
+            }
         }
     }
 }
