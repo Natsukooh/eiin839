@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Reflection;
@@ -117,13 +118,16 @@ namespace BasicServerHTTPlistener
 
                 // Obtain a response object.
                 HttpListenerResponse response = context.Response;
-                string htmlResponse = "";
+                string responseString = "";
 
                 if (request.Url.Segments.Length > 1)
                 {
                     switch (request.Url.Segments[1])
                     {
                         case "exercice1/":
+
+                            string htmlResponse = "";
+
                             if (request.Url.Segments.Length > 2)
                             {
                                 if (p[2] == "UwU" || p[3] == "UwU")
@@ -157,27 +161,52 @@ namespace BasicServerHTTPlistener
                             {
                                 htmlResponse = "No method ! Try with add, multiply or substract.";
                             }
+
+                            responseString = $"<!DOCTYPE html><html><body>{htmlResponse}</body></html>";
                             break;
 
                         case "exercice2/":
-                            htmlResponse = "Coming soon !";
+
+                            ProcessStartInfo start = new ProcessStartInfo();
+                            start.FileName = @"D:\Programs\env\Python\python.exe";
+                            start.Arguments = @"D:\Documents\SI4\S8\SOC\TDs-fork\TD2\BasicWebServer\get_html.py ";
+                            start.Arguments += $"{request.Url.Segments[2]} ";
+
+                            foreach (string param in p)
+                            {
+                                start.Arguments += ((param == null || param.Equals("")) ? "undefined" : param + " ");
+                            }
+
+                            Console.Write("Program arguments: " + start.Arguments);
+
+                            start.UseShellExecute = false;
+                            start.RedirectStandardOutput = true;
+
+                            using (Process process = Process.Start(start))
+                            {
+                                using (StreamReader reader = process.StandardOutput)
+                                {
+                                    string result = reader.ReadToEnd();
+                                    responseString = result;
+                                }
+                            }
+
                             break;
 
                         case "exercice3/":
-                            htmlResponse = "Coming soon !";
+                            responseString = $"<!DOCTYPE html><html><body>Coming soon !</body></html>";
                             break;
 
                         default:
-                            htmlResponse = "Invalid path !";
+                            responseString = $"<!DOCTYPE html><html><body>Invalid path !</body></html>";
                             break;
                     }
                 }
                 else
                 {
-                    htmlResponse = "Bad path !";
+                    responseString = $"<!DOCTYPE html><html><body>bad path !</body></html>";
                 }
 
-                string responseString = $"<!DOCTYPE html><html><body>{htmlResponse}</body></html>";
                 byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseString);
                 response.ContentLength64 = buffer.Length;
                 System.IO.Stream output = response.OutputStream;
