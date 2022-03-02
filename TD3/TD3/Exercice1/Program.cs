@@ -42,7 +42,7 @@ namespace MyApp // Note: actual namespace depends on the project name.
 
             foreach (Root element in jsonData)
             {
-                Console.WriteLine(element.contract_name);
+                Console.WriteLine($"{element.contract_name} - {element.name}");
             }
         }
     }
