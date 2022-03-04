@@ -7,6 +7,25 @@ using System.Reflection;
 using System.Text;
 using System.Web;
 
+/*
+ * TD2
+ * Les URLs possibles sont de la forme suivante : http://localhost:8080/exercice<N>/operation?param1=<number>&param2=<number>
+ * 
+ * Exemples d'URLs pour tester le serveur :
+ * 
+ * Exercice 1 :
+ *      http://localhost:8080/exercice1/add?param1=1&param2=2
+ *      http://localhost:8080/exercice1/substract?param1=5&param2=2
+ *      http://localhost:8080/exercice1/multiply?param1=3&param2=5
+ *      
+ * Exercice 2 :
+ *      http://localhost:8080/exercice2/add?param1=1&param2=2
+ *      http://localhost:8080/exercice2/substract?param1=5&param2=2
+ *      http://localhost:8080/exercice2/multiply?param1=3&param2=5
+ *      
+ * Pour l'exercice 3, utiliser le projet "ClientExercice3", son mode de fonctionnement est explicitement décrit lors du lancement du programme.
+*/
+
 namespace BasicServerHTTPlistener
 {
     internal class Program
@@ -14,28 +33,19 @@ namespace BasicServerHTTPlistener
         private static void Main(string[] args)
         {
 
-            //if HttpListener is not supported by the Framework
             if (!HttpListener.IsSupported)
             {
                 Console.WriteLine("A more recent Windows version is required to use the HttpListener class.");
                 return;
             }
 
-
-            // Create a listener.
             HttpListener listener = new HttpListener();
 
-            // Add the prefixes.
             if (args.Length != 0)
             {
                 foreach (string s in args)
                 {
                     listener.Prefixes.Add(s);
-                    // don't forget to authorize access to the TCP/IP addresses localhost:xxxx and localhost:yyyy 
-                    // with netsh http add urlacl url=http://localhost:xxxx/ user="Tout le monde"
-                    // and netsh http add urlacl url=http://localhost:yyyy/ user="Tout le monde"
-                    // user="Tout le monde" is language dependent, use user=Everyone in english 
-
                 }
             }
             else
@@ -44,16 +54,13 @@ namespace BasicServerHTTPlistener
             }
             listener.Start();
 
-            // get args 
             foreach (string s in args)
             {
                 Console.WriteLine("Listening for connections on " + s);
             }
 
-            // Trap Ctrl-C on console to exit 
             Console.CancelKeyPress += delegate
             {
-                // call methods to close socket and exit
                 listener.Stop();
                 listener.Close();
                 Environment.Exit(0);
@@ -62,7 +69,6 @@ namespace BasicServerHTTPlistener
 
             while (true)
             {
-                // Note: The GetContext method blocks while waiting for a request.
                 HttpListenerContext context = listener.GetContext();
                 HttpListenerRequest request = context.Request;
 
@@ -75,31 +81,21 @@ namespace BasicServerHTTPlistener
                     }
                 }
 
-                // get url 
                 Console.WriteLine($"Received request for {request.Url}");
 
-                //get url protocol
                 Console.WriteLine(request.Url.Scheme);
-                //get user in url
                 Console.WriteLine(request.Url.UserInfo);
-                //get host in url
                 Console.WriteLine(request.Url.Host);
-                //get port in url
                 Console.WriteLine(request.Url.Port);
-                //get path in url 
                 Console.WriteLine(request.Url.LocalPath);
 
-                // parse path in url 
                 foreach (string str in request.Url.Segments)
                 {
                     Console.WriteLine(str);
                 }
 
-                //get params un url. After ? and between &
-
                 Console.WriteLine(request.Url.Query);
 
-                //parse params in url
                 Console.WriteLine("param1 = " + HttpUtility.ParseQueryString(request.Url.Query).Get("param1"));
                 Console.WriteLine("param2 = " + HttpUtility.ParseQueryString(request.Url.Query).Get("param2"));
                 Console.WriteLine("param3 = " + HttpUtility.ParseQueryString(request.Url.Query).Get("param3"));
@@ -113,10 +109,8 @@ namespace BasicServerHTTPlistener
                     HttpUtility.ParseQueryString(request.Url.Query).Get("param4")
                 };
 
-                //
                 Console.WriteLine(documentContents);
 
-                // Obtain a response object.
                 HttpListenerResponse response = context.Response;
                 string responseString = "";
                 int count = 0;
@@ -240,8 +234,6 @@ namespace BasicServerHTTPlistener
 
 
             }
-            // Httplistener neither stop ... But Ctrl-C do that ...
-            // listener.Stop();
         }
     }
 

@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "BasicWebServer\Server.csproj", "{B6A28AAE-DA86-41D3-8A15-9B529A3AD71C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{B6A28AAE-DA86-41D3-8A15-9B529A3AD71C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientExercice3", "ClientExercice3\ClientExercice3.csproj", "{ACC4F8AD-711C-4E62-8E8A-76BBC4896073}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClientExercice3", "ClientExercice3\ClientExercice3.csproj", "{ACC4F8AD-711C-4E62-8E8A-76BBC4896073}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
