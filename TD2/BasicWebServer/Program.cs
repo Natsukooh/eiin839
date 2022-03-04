@@ -119,6 +119,7 @@ namespace BasicServerHTTPlistener
                 // Obtain a response object.
                 HttpListenerResponse response = context.Response;
                 string responseString = "";
+                int count = 0;
 
                 if (request.Url.Segments.Length > 1)
                 {
@@ -136,10 +137,10 @@ namespace BasicServerHTTPlistener
                                 }
                                 else
                                 {
-                                    Type methodsType = typeof(MyMethods);
-                                    MethodInfo method = methodsType.GetMethod(request.Url.Segments[2]);
+                                    Type _methodsType = typeof(MyMethods);
+                                    MethodInfo _method = _methodsType.GetMethod(request.Url.Segments[2]);
 
-                                    if (method == null)
+                                    if (_method == null)
                                     {
                                         htmlResponse = "Bad method !";
                                     }
@@ -147,8 +148,8 @@ namespace BasicServerHTTPlistener
                                     {
                                         try
                                         {
-                                            string result = (string)methodsType.GetMethod(request.Url.Segments[2]).Invoke(null, new object[] { p[0], p[1] });
-                                            htmlResponse = $"The result is {result}";
+                                            string __result = (string)_methodsType.GetMethod(request.Url.Segments[2]).Invoke(null, new object[] { p[0], p[1] });
+                                            htmlResponse = $"The result is {__result}";
                                         }
                                         catch (TargetInvocationException)
                                         {
@@ -168,13 +169,17 @@ namespace BasicServerHTTPlistener
                         case "exercice2/":
 
                             ProcessStartInfo start = new ProcessStartInfo();
-                            start.FileName = @"D:\Programs\env\Python\python.exe";
-                            start.Arguments = @"D:\Documents\SI4\S8\SOC\TDs-fork\TD2\BasicWebServer\get_html.py ";
-                            start.Arguments += $"{request.Url.Segments[2]} ";
+                            start.FileName = "python";
+                            start.Arguments = "../../get_html.py ";
+
+                            if (request.Url.Segments.Length > 2)
+                            {
+                                start.Arguments += $"{request.Url.Segments[2]} ";
+                            }
 
                             foreach (string param in p)
                             {
-                                start.Arguments += ((param == null || param.Equals("")) ? "undefined" : param + " ");
+                                start.Arguments += ((param == null || param.Equals("")) ? "undefined " : param + " ");
                             }
 
                             Console.Write("Program arguments: " + start.Arguments);
@@ -186,15 +191,35 @@ namespace BasicServerHTTPlistener
                             {
                                 using (StreamReader reader = process.StandardOutput)
                                 {
-                                    string result = reader.ReadToEnd();
-                                    responseString = result;
+                                    string _result = reader.ReadToEnd();
+                                    responseString = _result;
                                 }
                             }
 
                             break;
 
                         case "exercice3/":
-                            responseString = $"<!DOCTYPE html><html><body>Coming soon !</body></html>";
+                            Type methodsType = typeof(MyMethods);
+                            MethodInfo method = methodsType.GetMethod(request.Url.Segments[2]);
+                            string result = "";
+
+                            if (method == null)
+                            {
+                                result = "Bad method";
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    result = (string)methodsType.GetMethod(request.Url.Segments[2]).Invoke(null, new object[] { p[0] });
+                                }
+                                catch (TargetInvocationException)
+                                {
+                                    result = "Error";
+                                }
+                            }
+
+                            responseString = "{\"result\": \"" + result + "\"}";
                             break;
 
                         default:
@@ -222,6 +247,9 @@ namespace BasicServerHTTPlistener
 
     internal class MyMethods
     {
+
+        static int val = 0;
+
         public static string add(string p1, string p2)
         {
             try
@@ -262,6 +290,12 @@ namespace BasicServerHTTPlistener
             {
                 throw new FormatException();
             }
+        }
+
+        public static string incr(string add_val)
+        {
+            val += Int32.Parse(add_val);
+            return val.ToString();
         }
     }
 }

@@ -10,17 +10,22 @@ def main():
 	}
 	
 	result = ""
+	args = []
 	
-	if len(sys.argv) == 1:
+	for i in range(1, len(sys.argv)):
+		if sys.argv[i] != "undefined":
+			args.append(sys.argv[i])
+	
+	if len(args) == 0:
 		result = "Unspecified method !"
-	elif len(sys.argv) == 2:
+	elif len(args) == 1:
 		result = "Missing 2 arguments !"
-	elif len(sys.argv) == 3:
+	elif len(args) == 2:
 		result = "Missing 1 argument !"
 	else:
-		if sys.argv[1] in operations:
+		if args[0] in operations:
 			try:
-				result = f"the result is {operations[sys.argv[1]](int(sys.argv[2]), int(sys.argv[3]))}"
+				result = f"the result is {operations[args[0]](int(args[1]), int(args[2]))}"
 			except:
 				result = "Error: at least one given argument is not a number !"
 		else:
