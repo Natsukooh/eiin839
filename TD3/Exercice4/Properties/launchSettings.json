@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Exercice4": {
+      "commandName": "Project",
+      "commandLineArgs": "marseille 43,29618089851724 5,381463086273446"
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Exercice2": {
+      "commandName": "Project",
+      "commandLineArgs": "bruxelles"
+    }
+  }
+}
